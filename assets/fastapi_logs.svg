@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 340" font-family="Consolas, monospace">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d1117;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#161b22;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="340" rx="12" fill="url(#bg)" />
+  <rect x="0" y="0" width="800" height="35" rx="12" fill="#21262d" />
+  <circle cx="20" cy="17" r="6" fill="#ff5f57" />
+  <circle cx="40" cy="17" r="6" fill="#ffbd2e" />
+  <circle cx="60" cy="17" r="6" fill="#28c840" />
+  <text x="400" y="23" text-anchor="middle" fill="#8b949e" font-size="12" font-family="Segoe UI, Arial">FastAPI Server Logs — Terminal Output</text>
+
+  <text x="20" y="65" fill="#8b949e" font-size="11">marketplace-pipeline: Marketplace ETL Pipeline starting up…</text>
+  <text x="20" y="82" fill="#8b949e" font-size="11">marketplace-pipeline: Gemini model: gemini-3.1-flash-lite | available: True</text>
+  <text x="20" y="99" fill="#8b949e" font-size="11">marketplace-pipeline: Proxy: 95.164.111.230:9851</text>
+  <text x="20" y="116" fill="#58a6ff" font-size="11">=== EXTRACT === https://books.toscrape.com/…</text>
+  <text x="20" y="133" fill="#58a6ff" font-size="11">Extract done: sku=SKU-260527043856-FR87HL title=Ноутбук Sony Model 5312</text>
+  <text x="20" y="155" fill="#d2a8ff" font-size="11">=== TRANSFORM === sku=SKU-260527043856-FR87HL</text>
+  <text x="20" y="172" fill="#d2a8ff" font-size="11">Gemini unavailable — mock transform used</text>
+  <text x="20" y="189" fill="#d2a8ff" font-size="11">Transform done: clean_title=Ноутбук Премиум Model 5312</text>
+  <text x="20" y="211" fill="#7ee787" font-size="11">=== MOCK UPLOAD === sku=SKU-260527043856-FR87HL</text>
+  <text x="20" y="228" fill="#7ee787" font-size="11">Payload: title=Ноутбук Премиум Model 5312 | specs=['Бренд','Категория','Цвет','Гарантия']</text>
+  <text x="20" y="245" fill="#7ee787" font-size="11">Upload success: sku=SKU-260527043856-FR87HL marketplace_id=wb_3492239</text>
+
+  <text x="20" y="275" fill="#8b949e" font-size="10">INFO:     Application startup complete.</text>
+  <text x="20" y="290" fill="#58a6ff" font-size="10">INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)</text>
+  <text x="20" y="310" fill="#8b949e" font-size="10" font-style="italic">* Replace this file with a real screenshot of your terminal</text>
+</svg>

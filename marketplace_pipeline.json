@@ -1,0 +1,237 @@
+{
+  "name": "Marketplace ETL Pipeline",
+  "nodes": [
+    {
+      "id": "a1b2c3d4-0001-4000-8000-000000000001",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [250, 300],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "hoursInterval": 24
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "a1b2c3d4-0002-4000-8000-000000000002",
+      "name": "HTTP Request (URLs)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 300],
+      "parameters": {
+        "url": "http://127.0.0.1:8000/api/urls/test-list",
+        "method": "GET",
+        "authentication": "none",
+        "sendBody": false,
+        "options": {}
+      }
+    },
+    {
+      "id": "a1b2c3d4-0003-4000-8000-000000000003",
+      "name": "Split In Batches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [710, 300],
+      "parameters": {
+        "batchSize": 1
+      }
+    },
+    {
+      "id": "a1b2c3d4-0004-4000-8000-000000000004",
+      "name": "HTTP Request (Extract)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [940, 300],
+      "continueOnFail": true,
+      "parameters": {
+        "url": "http://127.0.0.1:8000/api/parser/extract",
+        "method": "POST",
+        "authentication": "none",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "url",
+              "value": "={{ $json.url }}"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "a1b2c3d4-0005-4000-8000-000000000005",
+      "name": "HTTP Request (Transform)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1170, 300],
+      "continueOnFail": true,
+      "parameters": {
+        "url": "http://127.0.0.1:8000/api/parser/transform",
+        "method": "POST",
+        "authentication": "none",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "original_sku",
+              "value": "={{ $json.original_sku }}"
+            },
+            {
+              "name": "raw_title",
+              "value": "={{ $json.raw_title }}"
+            },
+            {
+              "name": "raw_description",
+              "value": "={{ $json.raw_description }}"
+            },
+            {
+              "name": "raw_specs",
+              "value": "={{ $json.raw_specs }}"
+            },
+            {
+              "name": "media_urls",
+              "value": "={{ $json.media_urls }}"
+            },
+            {
+              "name": "source_url",
+              "value": "={{ $json.source_url }}"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "a1b2c3d4-0006-4000-8000-000000000006",
+      "name": "HTTP Request (Upload)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1400, 300],
+      "continueOnFail": true,
+      "parameters": {
+        "url": "http://127.0.0.1:8000/api/marketplace/mock-upload",
+        "method": "POST",
+        "authentication": "none",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "original_sku",
+              "value": "={{ $json.original_sku }}"
+            },
+            {
+              "name": "clean_title",
+              "value": "={{ $json.clean_title }}"
+            },
+            {
+              "name": "clean_description",
+              "value": "={{ $json.clean_description }}"
+            },
+            {
+              "name": "extracted_specs",
+              "value": "={{ $json.extracted_specs }}"
+            },
+            {
+              "name": "media_urls",
+              "value": "={{ $json.media_urls }}"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "a1b2c3d4-0007-4000-8000-000000000007",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [1630, 300],
+      "parameters": {
+        "amount": 2,
+        "unit": "seconds"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request (URLs)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request (URLs)": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split In Batches": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request (Extract)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "HTTP Request (Extract)": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request (Transform)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request (Transform)": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request (Upload)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request (Upload)": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "versionId": "a1b2c3d4-9999-4000-8000-000000000000",
+  "active": false,
+  "settings": {},
+  "staticData": null,
+  "tags": []
+}
