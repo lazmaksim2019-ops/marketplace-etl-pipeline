@@ -92,8 +92,6 @@
 2026-05-27 09:48:03 [INFO]  Upload success: marketplace_id=wb_3492239
 ```
 
-![FastAPI Server Logs](assets/fastapi_logs.svg)
-
 ---
 
 ## 🎯 Ключевые b2b-стандарты
