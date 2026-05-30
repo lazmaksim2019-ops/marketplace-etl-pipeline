@@ -1,0 +1,4 @@
+# Скрываем конфигурационные и shell-скрипты, делая фокус на бэкенд-коде
+*.sh linguist-vendored
+*.json linguist-vendored
+*.md linguist-documentation
