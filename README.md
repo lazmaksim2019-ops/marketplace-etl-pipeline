@@ -198,9 +198,12 @@ marketplace-etl-pipeline/
 
 ---
 
-<p align="center">
-  <strong>Сделано с ❤️ для селлеров маркетплейсов и автоматизации e-commerce</strong>
-  <br />
-  <a href="https://t.me/lazalex81">Telegram</a> •
-  <a href="mailto:lazalex81@gmail.com">Email</a>
-</p>
+---
+
+## 👨‍💻 Автор
+
+**Александр Лазаренко** — Fullstack / AI Developer (React + FastAPI + TypeScript + Python)
+
+[![Telegram](https://img.shields.io/badge/Telegram-26A5E4?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/lazalex81)
+[![Email](https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:lazalex81@gmail.com)
+[![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/lazmaksim2019-ops)
