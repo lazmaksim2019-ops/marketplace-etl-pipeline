@@ -1,38 +1,40 @@
-<<<<<<< HEAD
+<p align="center">
+  <img src="assets/pipeline_schema.png" alt="Marketplace ETL Pipeline Architecture" width="100%" style="border-radius: 12px;">
+</p>
+
 <div align="center">
-  <img src="assets/pipeline_schema.png" alt="Marketplace ETL Pipeline Architecture" width="100%">
+  <img src="https://img.shields.io/badge/Python-3.12-blue?style=for-the-badge&logo=python&logoColor=white" alt="Python" />
+  <img src="https://img.shields.io/badge/FastAPI-0.115-teal?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI" />
+  <img src="https://img.shields.io/badge/n8n-Self--hosted-red?style=for-the-badge&logo=n8n&logoColor=white" alt="n8n" />
+  <img src="https://img.shields.io/badge/Gemini-Flash_Lite-gold?style=for-the-badge&logo=googlebard&logoColor=white" alt="Gemini" />
+  <img src="https://img.shields.io/badge/Pydantic-v2-cyan?style=for-the-badge&logo=pydantic&logoColor=white" alt="Pydantic v2" />
+</div>
+
+<div align="center">
+  <a href="https://github.com/lazmaksim2019-ops/marketplace-etl-pipeline/actions"><img src="https://img.shields.io/github/actions/workflow/status/lazmaksim2019-ops/marketplace-etl-pipeline/ci.yml?branch=master&style=for-the-badge&logo=githubactions&label=CI/CD" alt="CI/CD" /></a>
+  <a href="https://codecov.io/gh/lazmaksim2019-ops/marketplace-etl-pipeline"><img src="https://img.shields.io/codecov/c/github/lazmaksim2019-ops/marketplace-etl-pipeline?style=for-the-badge&logo=codecov&label=Coverage" alt="Codecov" /></a>
+  <a href="https://github.com/lazmaksim2019-ops/marketplace-etl-pipeline"><img src="https://img.shields.io/github/last-commit/lazmaksim2019-ops/marketplace-etl-pipeline?style=for-the-badge&logo=github&color=8b5cf6" alt="Last Commit" /></a>
+  <img src="https://img.shields.io/badge/Docker-ready-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
+  <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License MIT" />
 </div>
 
 <h1 align="center">
   🤖 Асинхронный ИИ-Парсер каталогов и ETL-конвейер для маркетплейсов
 </h1>
 
-=======
->>>>>>> 963ffb6 (Add .gitattributes, update README.md, add pipeline schema)
 <p align="center">
-  <div align="center">
-    <img src="https://img.shields.io/badge/Python-3.11_/_3.12-blue?style=for-the-badge&logo=python&logoColor=white" alt="Python" />
-    <img src="https://img.shields.io/badge/FastAPI-0.115-teal?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI" />
-    <img src="https://img.shields.io/badge/n8n-Self--hosted-red?style=for-the-badge&logo=n8n&logoColor=white" alt="n8n" />
-    <img src="https://img.shields.io/badge/Gemini-3.1_Flash_Lite-gold?style=for-the-badge&logo=googlebard&logoColor=white" alt="Gemini" />
-    <img src="https://img.shields.io/badge/Pydantic-v2_Validation-cyan?style=for-the-badge&logo=pydantic&logoColor=white" alt="Pydantic v2" />
-    <img src="https://img.shields.io/badge/B2B-Enterprise_Integration-blueviolet?style=for-the-badge&logo=enterprise" alt="B2B Integration" />
-  </div>
-</p>
-
-<h1 align="center">🤖 Асинхронный ИИ-Парсер каталогов и ETL-конвейер для маркетплейсов</h1>
-
-<p align="center">
-  <b>Промышленный отказоустойчивый B2B-пайплайн автоматизации e-commerce. Сквозная интеграция n8n + Python (FastAPI) + Google Gemini API для массового импорта и ИИ-уникализации контента.</b>
+  <b>Промышленный отказоустойчивый B2B-пайплайн автоматизации e-commerce.</b>
+  Сквозная интеграция n8n + Python (FastAPI) + Google Gemini API
+  для массового импорта и ИИ-уникализации контента.
 </p>
 
 > **⚡ Ключевая бизнес-ценность:** Автоматизирует рутину контент-менеджеров по переносу товаров от поставщиков или конкурентов. Система берет на себя парсинг, обход блокировок, глубокий рерайт (удаление чужих брендов, SEO-насыщение) и подготовку валидных данных для загрузки в маркетплейс в один клик.
 
 ---
 
-## 🏗 Архитектура Системы (System Design)
+## 🏗 Архитектура (System Design)
 
-Пайплайн спроектирован по канонам событийно-ориентированной архитектуры (EDA) с разделением ответственности (Separation of Concerns): n8n отвечает за оркестрацию и временные задержки, а FastAPI-бэкенд — за вычислительные процессы (парсинг) и бизнес-логику ИИ-валидации.
+Пайплайн спроектирован по канонам событийно-ориентированной архитектуры (EDA) с разделением ответственности: n8n отвечает за оркестрацию и временные задержки, а FastAPI-бэкенд — за вычислительные процессы (парсинг) и бизнес-логику ИИ-валидации.
 
 ```mermaid
 graph TD
@@ -51,37 +53,49 @@ graph TD
 
 ---
 
-## 💎 Промышленные B2B-стандарты проекта
+## 💎 Промышленные B2B-стандарты
 
-### 1. Управление лимитами (Rate Limiting & Safety)
+### Rate Limiting & Safety
+Данные разбиваются на изолированные батчи по **1 товару**. Между батчами — задержка **2 секунды** (Wait Node n8n), что гарантирует отсутствие блокировки по HTTP 429.
 
-Большинство ИИ-провайдеров и API маркетплейсов имеют строгие ограничения на количество запросов в секунду (RPM/TPM), возвращая ошибку HTTP 429. В нашем n8n-сценарии реализован паттерн контролируемого батчинга:
+### Error Isolation
+Сбой при парсинге одной битой ссылки или таймаут Gemini не останавливают весь конвейер. `continueOnFail: true` в n8n + логирование ошибок на стороне FastAPI.
 
-- Данные разбиваются на изолированные батчи по **1 товару**.
-- Между батчами установлена задержка в **2 секунды** через Wait Node, что гарантирует стабильную работу без блокировок ключей.
+### SOCKS5/HTTP-прокси
+Встроенная поддержка прокси для стабильного доступа к Gemini API из инфраструктуры РФ. Прокси автоматически прокидываются как в `httpx.AsyncClient`, так и в SDK Gemini.
 
-### 2. Изоляция ошибок (Error Isolation & Fail-Safety)
-
-Сбой при парсинге одной битой ссылки или временный таймаут Gemini API не должны приводить к остановке всего ETL-процесса.
-
-- В воркфлоу n8n для критических узлов активирована опция `continueOnFail: true`.
-- Невалидные итерации логируются на стороне FastAPI-сервера, а конвейер беспрепятственно продолжает обработку оставшихся сотен товаров.
-
-### 3. Сквозная поддержка SOCKS5/HTTP-прокси
-
-Для стабильного доступа к API моделей Google Gemini из инфраструктуры РФ реализована встроенная поддержка сетевых прокси-серверов. Логика бэкенда автоматически прокидывает настройки прокси как в асинхронный клиент `httpx.AsyncClient` для парсинга сайтов, так и в SDK Gemini для генерации контента.
-
-### 4. Строгий контракт данных (Pydantic v2 Validation)
-
-Для исключения «галлюцинаций» языковых моделей и поломки структуры данных при импорте, бэкенд использует жесткую валидацию схемы ответа. Перед отправкой данных в маркетплейс, ИИ-ответ преобразуется в типизированный объект Pydantic:
+### Pydantic v2 Validation
+Жёсткая валидация схемы ответа перед отправкой в маркетплейс исключает «галлюцинации» языковых моделей:
 
 ```python
 class CleanProductData(BaseModel):
-    original_sku: str          # Уникальный артикул товара
-    clean_title: str           # Заголовок (очищенный от чужих брендов, SEO-оптимизированный)
-    clean_description: str     # Уникализированное описание товара
-    extracted_specs: dict      # Структурированные технические характеристики
-    media_urls: list[str]      # Ссылки на медиа-контент
+    original_sku: str
+    clean_title: str
+    clean_description: str
+    extracted_specs: dict
+    media_urls: list[str]
+```
+
+---
+
+## 📡 API Endpoints
+
+| Метод | Эндпоинт | Описание | Вход | Выход |
+|-------|----------|----------|------|-------|
+| `GET` | `/health` | Статус бэкенда и Gemini | — | `{"status": "ok"}` |
+| `POST` | `/api/parser/extract` | Парсинг страницы товара-донора | `{"url": "string"}` | `RawProductData` |
+| `POST` | `/api/parser/transform` | SEO-рерайт через Gemini | `RawProductData` | `CleanProductData` |
+| `POST` | `/api/marketplace/mock-upload` | Симуляция выгрузки в маркетплейс | `CleanProductData` | `UploadResponse` |
+
+### Бортовые логи сервера
+
+```text
+2026-05-27 09:47:14 [INFO]  Marketplace ETL Pipeline starting up…
+2026-05-27 09:47:14 [INFO]  Gemini: gemini-3.1-flash-lite | available: True
+2026-05-27 09:48:01 [INFO]  === EXTRACT === https://books.toscrape.com/...
+2026-05-27 09:48:01 [INFO]  Extract done: sku=SKU-260527-DF2Y85 title=Ноутбук Sony Model 5312
+2026-05-27 09:48:02 [INFO]  === TRANSFORM === sku=SKU-260527-DF2Y85
+2026-05-27 09:48:03 [INFO]  Upload success: marketplace_id=wb_3492239
 ```
 
 ---
@@ -89,103 +103,57 @@ class CleanProductData(BaseModel):
 ## 🛠 Технологический стек
 
 | Компонент | Технология | Назначение |
-|-----------|-----------|-----------|
-| **Оркестратор пайплайнов** | n8n (Self-hosted) | Визуальное проектирование сценариев, батчинг данных, управление очередью |
-| **Бэкенд** | Python 3.11, FastAPI, Uvicorn | Асинхронная обработка сетевых запросов |
-| **ИИ-ядро** | Google Gemini 3.1 Flash Lite API | Структурированная генерация контента (application/json) |
-| **Парсинг и сеть** | BeautifulSoup4, httpx | Асинхронный клиент с поддержкой пула соединений |
-| **Валидация** | Pydantic v2 | Строгие b2b-схемы данных на входе и выходе |
-
----
-
-## 📡 Эндпоинты FastAPI
-
-<<<<<<< HEAD
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                         n8n Workflow                                │
-│                                                                     │
-│  ┌─────────┐   ┌──────────┐   ┌──────────────┐   ┌──────────────┐  │
-│  │Schedule │──▶│  HTTP    │──▶│    Split     │──▶│    Wait      │  │
-│  │Trigger  │   │  URLs    │   │  In Batches  │   │    2s        │  │
-│  └─────────┘   └──────────┘   └──────┬───────┘   └──────────────┘  │
-│                                       │                             │
-│                          ┌────────────▼────────────┐               │
-│                          │     Loop body (×N)      │               │
-│                          │  ┌──────────────────┐  │               │
-│                          │  │ HTTP Extract     │  │               │
-│                          │  │ POST /extract    │  │               │
-│                          │  └────────┬─────────┘  │               │
-│                          │  ┌────────▼─────────┐  │               │
-│                          │  │ HTTP Transform   │  │               │
-│                          │  │ POST /transform  │  │               │
-│                          │  └────────┬─────────┘  │               │
-│                          │  ┌────────▼─────────┐  │               │
-│                          │  │ HTTP Upload      │  │               │
-│                          │  │ POST /mock-upload│  │               │
-│                          │  └──────────────────┘  │               │
-│                          └────────────────────────┘               │
-└─────────────────────────────────────────────────────────────────────┘
-```
-
-### 📊 Бортовые логи сервера
-
-При запуске воркфлоу бэкенд логирует каждый этап трансформации:
-
-```text
-2026-05-27 09:47:14 [INFO]  Marketplace ETL Pipeline starting up…
-2026-05-27 09:47:14 [INFO]  Gemini: gemini-3.1-flash-lite | available: True
-2026-05-27 09:47:14 [INFO]  Proxy: 95.164.111.230:9851
-
-2026-05-27 09:48:01 [INFO]  === EXTRACT === https://books.toscrape.com/...
-2026-05-27 09:48:01 [INFO]  Extract done: sku=SKU-260527-DF2Y85 title=Ноутбук Sony Model 5312
-
-2026-05-27 09:48:02 [INFO]  === TRANSFORM === sku=SKU-260527-DF2Y85
-2026-05-27 09:48:02 [INFO]  Transform done: clean_title=Ноутбук Премиум Model 5312
-
-2026-05-27 09:48:02 [INFO]  === MOCK UPLOAD === sku=SKU-260527-DF2Y85
-2026-05-27 09:48:03 [INFO]  Upload success: marketplace_id=wb_3492239
-```
-=======
-| Метод | Эндпоинт | Описание | Входные данные | Выходные данные |
-|-------|---------|---------|---------------|----------------|
-| `POST` | `/api/parser/extract` | Асинхронный парсинг сырого контента со страницы донора | `{"url": "string"}` | `RawProductData` |
-| `POST` | `/api/parser/transform` | Генерация SEO-контента и рерайт характеристик через Gemini | `RawProductData` | `CleanProductData` |
-| `POST` | `/api/marketplace/mock-upload` | Симуляция отгрузки в API личного кабинета маркетплейса | `CleanProductData` | `UploadResponse` |
-| `GET` | `/health` | Проверка доступности бэкенда и статуса подключения к Gemini | — | `{"status": "ok"}` |
->>>>>>> 963ffb6 (Add .gitattributes, update README.md, add pipeline schema)
+|-----------|------------|-----------|
+| **Оркестратор** | n8n (Self-hosted) | Визуальное проектирование сценариев, батчинг, очередь |
+| **Бэкенд** | Python 3.12 / FastAPI / Uvicorn | Асинхронная обработка запросов |
+| **ИИ-ядро** | Google Gemini 3.1 Flash Lite | Структурированная JSON-генерация контента |
+| **Парсинг** | BeautifulSoup4 / httpx / lxml | Асинхронный парсинг с пулом соединений |
+| **Валидация** | Pydantic v2 | Строгие B2B-схемы на входе и выходе |
+| **Тесты** | pytest / pytest-asyncio / httpx | Интеграционные тесты API |
+| **CI/CD** | GitHub Actions | Lint → Test → Coverage → Build |
+| **Контейнеризация** | Docker / multi-stage | Лёгкий деплой (финальный образ ~130 MB) |
 
 ---
 
 ## 💻 Быстрый старт
 
 ```bash
-# 1. Клонирование репозитория
+# 1. Клонирование
 git clone https://github.com/lazmaksim2019-ops/marketplace-etl-pipeline.git
 cd marketplace-etl-pipeline
 
-# 2. Создание и активация окружения
+# 2. Окружение
 python -m venv .venv
-source .venv/bin/activate  # Для Linux/macOS
-# .venv\Scripts\activate   # Для Windows
+source .venv/bin/activate      # Linux/macOS
+# .venv\Scripts\activate       # Windows
 
-# 3. Установка зависимостей
+# 3. Зависимости
 pip install -r requirements.txt
+pip install pytest pytest-asyncio httpx  # для тестов
 
-# 4. Настройка переменных среды
+# 4. Настройка
 cp .env.example .env
-# Заполните в .env ваш GEMINI_API_KEY и параметры прокси-сервера
+# Заполните GEMINI_API_KEY и PROXY_* в .env
 
-# 5. Запуск FastAPI сервера
+# 5. Запуск
 uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+# 6. Тесты
+pytest -v --cov=. --cov-report=term
 ```
 
-### Настройка n8n-сценария
+### Через Docker
 
+```bash
+docker build -t marketplace-etl-pipeline .
+docker run -p 8000:8000 --env-file .env marketplace-etl-pipeline
+```
+
+### Импорт n8n-сценария
 1. Запустите n8n (локально или в облаке).
-2. Создайте новый пустой сценарий (Workflow).
-3. Откройте файл `marketplace_pipeline.json` из репозитория, скопируйте его содержимое.
-4. Вставьте скопированный JSON прямо на холст n8n с помощью клавиш **Ctrl+V** (или **Cmd+V**). Пайплайн со всеми связями импортируется автоматически!
+2. Создайте новый Workflow.
+3. Откройте `marketplace_pipeline.json`, скопируйте содержимое.
+4. Вставьте на холст n8n — **Ctrl+V** (**Cmd+V**). Пайплайн импортируется автоматически!
 
 ---
 
@@ -193,26 +161,46 @@ uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
 ```
 marketplace-etl-pipeline/
-├── .gitignore                 # Игнорируем .env, __pycache__, .venv
-├── .env.example               # Шаблон переменных окружения (без секретов)
-├── README.md                  # Документация (вы здесь)
-├── rules.md                   # Протокол разработки ETL
-├── requirements.txt           # Python-зависимости
-├── main.py                    # FastAPI сервер (точка входа)
-├── models.py                  # Pydantic v2 схемы данных
-├── marketplace_pipeline.json  # n8n workflow (готов к импорту)
-└── assets/                    # Визуальные материалы
-    └── pipeline_schema.svg    # Архитектура пайплайна
+├── .github/workflows/ci.yml   # CI/CD конвейер
+├── .dockerignore               # Исключения для Docker
+├── .env.example                # Шаблон переменных окружения
+├── .gitignore                  # Игнорируемые файлы
+├── pyproject.toml              # Конфиг ruff, pytest, coverage
+├── Dockerfile                  # Multi-stage сборка
+├── README.md                   # Документация
+├── rules.md                    # Протокол разработки ETL
+├── requirements.txt            # Python-зависимости
+├── main.py                     # FastAPI сервер (точка входа)
+├── models.py                   # Pydantic v2 схемы данных
+├── marketplace_pipeline.json   # n8n workflow
+├── tests/                      # Тесты
+│   ├── __init__.py
+│   └── test_main.py
+└── assets/
+    └── pipeline_schema.png     # Архитектура пайплайна
 ```
+
+---
+
+## 🔄 Workflow CI/CD
+
+| Этап | Команда | Описание |
+|------|---------|----------|
+| Lint | `ruff check . && ruff format --check .` | Статический анализ кода |
+| Test | `pytest -v --cov=. --cov-report=xml --cov-report=term` | 15+ тестов с покрытием |
+| Build | `docker build -t marketplace-etl-pipeline .` | Проверка сборки Docker |
 
 ---
 
 ## 📄 Лицензия
 
-Распространяется под лицензией **MIT**. Смотрите файл `LICENSE` для деталей.
+Распространяется под лицензией **MIT**.
 
 ---
 
 <p align="center">
   <strong>Сделано с ❤️ для селлеров маркетплейсов и автоматизации e-commerce</strong>
+  <br />
+  <a href="https://t.me/lazalex81">Telegram</a> •
+  <a href="mailto:lazalex81@gmail.com">Email</a>
 </p>

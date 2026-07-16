@@ -1,5 +1,5 @@
 import json
-from typing import Dict, List, Union
+
 from pydantic import BaseModel, Field, HttpUrl, field_validator
 
 
@@ -11,8 +11,8 @@ class RawProductData(BaseModel):
     original_sku: str = Field(description="Исходный артикул конкурента")
     raw_title: str = Field(description="Сырой заголовок товара")
     raw_description: str = Field(description="Сырое описание товара")
-    raw_specs: Union[Dict[str, str], str] = Field(description="Характеристики товара")
-    media_urls: Union[List[str], str] = Field(description="Ссылки на изображения")
+    raw_specs: dict[str, str] | str = Field(description="Характеристики товара")
+    media_urls: list[str] | str = Field(description="Ссылки на изображения")
     source_url: str = Field(description="URL исходной страницы")
 
     @field_validator("raw_specs")
@@ -40,8 +40,8 @@ class CleanProductData(BaseModel):
     original_sku: str = Field(description="Исходный артикул конкурента")
     clean_title: str = Field(description="Уникальный SEO-заголовок без чужих брендов")
     clean_description: str = Field(description="Переписанный B2C/B2B-текст")
-    extracted_specs: Dict[str, str] = Field(description="Очищенные характеристики товара")
-    media_urls: List[str] = Field(description="Ссылки на изображения")
+    extracted_specs: dict[str, str] = Field(description="Очищенные характеристики товара")
+    media_urls: list[str] = Field(description="Ссылки на изображения")
 
 
 class UploadResponse(BaseModel):

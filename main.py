@@ -1,30 +1,29 @@
-import os
-import re
-import json
 import asyncio
-import random
+import json
 import logging
+import os
+import random
+import re
 import string
-
-from dotenv import load_dotenv
-
-load_dotenv()
-from datetime import datetime, timezone
 from contextlib import asynccontextmanager
-from typing import Dict
+from datetime import UTC, datetime
+from urllib.parse import urljoin, urlparse
 
 import httpx
-from fastapi import FastAPI, HTTPException
 from bs4 import BeautifulSoup
+from dotenv import load_dotenv
+from fastapi import FastAPI, HTTPException
 
 from models import (
+    CleanProductData,
     ExtractRequest,
     RawProductData,
-    CleanProductData,
     UploadResponse,
 )
 
 # ── Environment ──────────────────────────────────────────────────
+
+load_dotenv()
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.1-flash-lite")
@@ -77,7 +76,7 @@ except Exception as exc:
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(_app: FastAPI) -> None:  # noqa: ARG001
     logger.info("Marketplace ETL Pipeline starting up…")
     logger.info("Gemini model: %s | available: %s", GEMINI_MODEL, _gemini_available)
     if PROXY_URL:
@@ -96,15 +95,19 @@ app = FastAPI(
 # ── Helpers ──────────────────────────────────────────────────────
 
 
+def _resolve_url(base: str, path: str) -> str:
+    return urljoin(base, path)
+
+
 def _get_httpx_client() -> httpx.AsyncClient:
-    kwargs: Dict = {"timeout": httpx.Timeout(30.0, connect=10.0)}
+    kwargs: dict = {"timeout": httpx.Timeout(30.0, connect=10.0)}
     if PROXY_URL:
         kwargs["proxies"] = {"http://": PROXY_URL, "https://": PROXY_URL}
     return httpx.AsyncClient(**kwargs)
 
 
 def _generate_sku() -> str:
-    ts = datetime.now(timezone.utc).strftime("%y%m%d%H%M%S")
+    ts = datetime.now(UTC).strftime("%y%m%d%H%M%S")
     rand = "".join(random.choices(string.ascii_uppercase + string.digits, k=6))
     return f"SKU-{ts}-{rand}"
 
@@ -163,7 +166,7 @@ async def _scrape_url(url: str) -> RawProductData | None:
                 raw_description = desc_div.get_text(strip=True, separator=" ")
 
         # характеристики
-        specs: Dict[str, str] = {}
+        specs: dict[str, str] = {}
         for row in soup.select(
             "table.attributes tr, .specs tr, "
             ".product-attribute, .characteristic, "
@@ -211,25 +214,30 @@ async def _scrape_url(url: str) -> RawProductData | None:
         return None
 
 
-def _resolve_url(base: str, path: str) -> str:
-    from urllib.parse import urljoin
-    return urljoin(base, path)
-
-
 def _generate_mock_product(url: str) -> RawProductData:
     """Генерирует правдоподобные мок-данные при недоступности парсера."""
-    from urllib.parse import urlparse
     domain = urlparse(url).netloc or url
     sku = _generate_sku()
 
-    categories = ["Смартфон", "Наушники", "Ноутбук", "Планшет", "Часы"]
-    brands = ["Xiaomi", "Samsung", "Apple", "Huawei", "Sony"]
+    categories = [
+        "Смартфон",
+        "Наушники",
+        "Ноутбук",
+        "Планшет",
+        "Часы",
+        "Телевизор",
+        "Фотоаппарат",
+        "Колонка",
+        "Монитор",
+        "Клавиатура",
+    ]
+    brands = ["Xiaomi", "Samsung", "Apple", "Huawei", "Sony", "LG", "Asus", "Lenovo", "HP", "Dell"]
     cat = random.choice(categories)
     brand = random.choice(brands)
 
     return RawProductData(
         original_sku=sku,
-        raw_title=f"{cat} {brand} Model {random.randint(1000,9999)} ({domain})",
+        raw_title=f"{cat} {brand} Model {random.randint(1000, 9999)} ({domain})",
         raw_description=(
             f"Оригинальный {cat.lower()} {brand}. "
             f"Гарантия 12 месяцев. Доставка по всей РФ. "
@@ -271,16 +279,8 @@ def _mock_transform(raw_data: RawProductData) -> CleanProductData:
             f"Оригинальная гарантия, быстрая доставка. "
             f"Подходит для дома и офиса. Высокое качество."
         ),
-        extracted_specs=(
-            raw_data.raw_specs
-            if isinstance(raw_data.raw_specs, dict)
-            else {}
-        ),
-        media_urls=(
-            raw_data.media_urls
-            if isinstance(raw_data.media_urls, list)
-            else []
-        ),
+        extracted_specs=(raw_data.raw_specs if isinstance(raw_data.raw_specs, dict) else {}),
+        media_urls=(raw_data.media_urls if isinstance(raw_data.media_urls, list) else []),
     )
 
 
@@ -363,7 +363,8 @@ async def extract_product(request: ExtractRequest):
 
     logger.info(
         "Extract done: sku=%s title=%s",
-        data.original_sku, data.raw_title[:80],
+        data.original_sku,
+        data.raw_title[:80],
     )
     return data
 
@@ -378,16 +379,20 @@ async def transform_product(raw_data: RawProductData):
     logger.info("=== TRANSFORM === sku=%s", raw_data.original_sku)
 
     try:
-        result = await _call_gemini(raw_data)
+        result = await asyncio.wait_for(_call_gemini(raw_data), timeout=10.0)
         if result is None:
             logger.warning("Gemini transform failed — using mock transform")
             result = _mock_transform(raw_data)
 
         logger.info(
             "Transform done: sku=%s clean_title=%s",
-            result.original_sku, result.clean_title[:80],
+            result.original_sku,
+            result.clean_title[:80],
         )
         return result
+    except (TimeoutError, asyncio.CancelledError):
+        logger.warning("Gemini timed out — using mock transform")
+        return _mock_transform(raw_data)
     except Exception:
         logger.exception("Unhandled error in transform endpoint")
         raise
@@ -425,7 +430,8 @@ async def mock_upload(product: CleanProductData):
 
     logger.info(
         "Upload success: sku=%s marketplace_id=%s",
-        product.original_sku, marketplace_id,
+        product.original_sku,
+        marketplace_id,
     )
     return UploadResponse(status="success", marketplace_id=marketplace_id)
 
